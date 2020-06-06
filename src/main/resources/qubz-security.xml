@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:scr="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+	http://www.springframework.org/schema/security
+	http://www.springframework.org/schema/security/spring-security-4.2.xsd
+	http://www.springframework.org/schema/util
+	http://www.springframework.org/schema/util/spring-util-4.3.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<beans>
+		<scr:http auto-config="false" use-expressions="true">
+			<scr:form-login login-page="/login"
+				login-processing-url="/authenticateUser"
+				authentication-success-handler-ref="cookiesAuthenticationSuccessHandler"
+				default-target-url="/welcome" authentication-failure-url="/login"
+				username-parameter="username" password-parameter="password" />
+
+			<scr:access-denied-handler
+				error-page="/jsp/403.jsp" />
+
+			<scr:intercept-url pattern="/login"
+				access="permitAll" />
+
+			<scr:intercept-url pattern="/**"
+				access="hasAuthority('AUTH_USER')" />
+
+			<scr:custom-filter position="PRE_AUTH_FILTER"
+				ref="preAuthFilter" />
+
+			<scr:custom-filter position="FIRST"
+				ref="cookieLogoutFilterChain" />
+
+			<scr:session-management
+				invalid-session-url="/login" />
+
+			<scr:logout delete-cookies="JSESSIONID"
+				logout-url="/logout" />
+		</scr:http>
+
+		<context:component-scan
+			base-package="com.ustglobal.qubz" />
+
+		<!-- auth manager -->
+
+		<scr:authentication-manager
+			erase-credentials="false" alias="authenticationManager">
+			<scr:authentication-provider
+				ref="preAuthenticationProvider" />
+			<scr:authentication-provider
+				ref="customAuthenticationProvider" />
+		</scr:authentication-manager>
+
+		<!-- PreAuth Filter -->
+
+		<bean id="preAuthenticationProvider"
+			class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+			<property name="preAuthenticatedUserDetailsService"
+				ref="UserDetailsServiceImpl" />
+		</bean>
+
+		<bean id="preAuthFilter"
+			class="com.ustglobal.qubz.filter.QubzPreAuthenticationFilter">
+			<property name="authenticationManager"
+				ref="authenticationManager" />
+			<property name="authenticationSuccessHandler"
+				ref="preAuthenticationSuccessHandler" />
+		</bean>
+
+		<bean id="UserDetailsServiceImpl"
+			class="com.ustglobal.qubz.authentication.UserDetailsServiceImpl" />
+
+		<bean id="preAuthenticatedProcessingFilterEntryPoint"
+			class="com.ustglobal.qubz.authentication.handler.AuthenticationEntryPointDenied" />
+
+		<bean id="preAuthenticationSuccessHandler"
+			class="com.ustglobal.qubz.authentication.handler.PreAuthenticationSuccessHandler" />
+
+		<!-- Logout Filter -->
+		<bean id="cookieLogoutFilterChain"
+			class="org.springframework.security.web.FilterChainProxy">
+			<scr:filter-chain-map request-matcher="ant">
+				<scr:filter-chain pattern="/logout"
+					filters="cookieLogoutFilter" />
+			</scr:filter-chain-map>
+		</bean>
+		<!-- Handler for successful logout -->
+
+		<bean id="cookieLogoutFilter"
+			class="com.ustglobal.qubz.filter.CookiesLogoutFilter">
+			<constructor-arg>
+				<bean
+					class="org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler" />
+			</constructor-arg>
+			<constructor-arg>
+				<bean
+					class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler" />
+			</constructor-arg>
+		</bean>
+
+	</beans>
+
+</beans>
