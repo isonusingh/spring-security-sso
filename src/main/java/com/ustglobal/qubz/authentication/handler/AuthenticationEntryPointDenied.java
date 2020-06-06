@@ -18,7 +18,7 @@ public class AuthenticationEntryPointDenied implements AuthenticationEntryPoint 
 
 		// Redirecting service to access denied page for invalid users
 		RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
-		redirectStrategy.sendRedirect(request, response, "/qubz-sso/login");
+		redirectStrategy.sendRedirect(request, response, "/spring-security-sso/login");
 
 	}
 

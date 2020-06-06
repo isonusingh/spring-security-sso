@@ -14,7 +14,7 @@ import com.ustglobal.qubz.model.SSOSession;
 @Component
 public class SSOSessionClient {
 
-	private String url = "http://34.212.135.8:1978/ssosession";
+	private String url = "http://hostname:port/ssosession";
 	private RestTemplate restTemplate = new RestTemplate();
 
 	public SSOSession createSSOSession(String applicationName, String username) {

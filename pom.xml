@@ -83,7 +83,7 @@
 
 	</dependencies>
 	<build>
-		<finalName>qubz-sso</finalName>
+		<finalName>spring-security-sso</finalName>
 		<pluginManagement>
 
 			<plugins>

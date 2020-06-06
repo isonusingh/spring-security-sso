@@ -35,7 +35,7 @@ public class CookiesAuthenticationSuccessHandler implements AuthenticationSucces
 		cookie.setPath("/");
 
 		response.addCookie(cookie);
-		response.sendRedirect("/qubz-sso/welcome");
+		response.sendRedirect("/spring-security-sso/welcome");
 //		super.onAuthenticationSuccess(request, response, authentication);
 
 	}
